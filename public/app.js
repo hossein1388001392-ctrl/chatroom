@@ -34,6 +34,6 @@ function delMsg(id){
 }
 
 socket.on("deleted",id=>{
- let e=document.querySelector(".bubble button.del");
- if(e) e.parentElement.remove();
+ let e=document.querySelector(`[data-id="${id}"]`);
+ if(e) e.remove();
 });
