@@ -17,20 +17,23 @@ async function users(){
 let us=await api("/api/users");
 let list=us.filter(x=>x.id!==user.id);
 
-$("users").innerHTML=list.map(x=>`<button onclick="room='dm:${x.id}';load()">👤 ${x.username}</button>`).join("");
+let box=$("messages");
 
-if($("chatlist")){
-$("chatlist").innerHTML=list.map(x=>`
+if(box){
+box.innerHTML=list.map(x=>`
 <div class="chatitem" onclick="room='dm:${x.id}';load()">
 <div class="avatar">👤</div>
-<div class="chatinfo">
+<div>
 <div class="chatname">${x.username}</div>
 <div class="lastmsg">شروع گفتگو</div>
 </div>
 </div>
 `).join("");
 }
+
+$("users").innerHTML="";
 }
+
 async function load(){socket.emit("join",{room,username:user.username});$("title").textContent=room==="general"?"عمومی":"گفتگوی خصوصی";$("messages").innerHTML="";(await api("/api/messages/"+encodeURIComponent(room))).forEach(show)}
 function show(m){
 let d=document.createElement("div");
