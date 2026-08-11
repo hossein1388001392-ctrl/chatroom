@@ -114,7 +114,8 @@ users();
 
 
 function openChat(id,name){
- room="dm:"+id;
+ let ids=[user.id,String(id)].sort();
+room="dm:"+ids.join(":");
 
  $("chatlist").style.display="none";
  $("contacts").style.display="none";
