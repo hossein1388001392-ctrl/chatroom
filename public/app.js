@@ -11,6 +11,8 @@ $("chat").classList.remove("hide");
 $("me").textContent="@"+u.username;
 users();
 $("messages").innerHTML="";
+$("messages").style.display="none";
+$("contacts").style.display="block";
 $("title").textContent="گفتگوها";
 }
 async function users(){
