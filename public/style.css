@@ -208,3 +208,18 @@ font-size:10px !important;
 padding:4px !important;
 }
 
+
+body::before{
+content:"نسخه جدید ChatRoom فعال شد";
+position:fixed;
+top:0;
+left:0;
+right:0;
+background:red;
+color:white;
+text-align:center;
+z-index:99999;
+font-size:20px;
+padding:10px;
+}
+
