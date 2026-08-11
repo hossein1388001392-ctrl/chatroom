@@ -101,3 +101,11 @@ function menuMsg(id){
 let m=document.getElementById("menu-"+id);
 if(m)m.style.display=m.style.display==="block"?"none":"block";
 }
+
+function home(){
+$("messages").style.display="none";
+$("contacts").style.display="block";
+$("title").textContent="گفتگوها";
+users();
+}
+
