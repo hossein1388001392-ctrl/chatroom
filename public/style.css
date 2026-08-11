@@ -604,3 +604,30 @@ display:none;
 }
 }
 
+
+.chatlist{
+display:block!important;
+background:#111b21;
+height:100%;
+overflow:auto;
+}
+
+.chatitem{
+display:flex;
+align-items:center;
+gap:12px;
+padding:12px;
+border-bottom:1px solid #202c33;
+cursor:pointer;
+}
+
+.avatar{
+width:45px;
+height:45px;
+border-radius:50%;
+background:#00a884;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
