@@ -4,7 +4,15 @@ const $=x=>document.getElementById(x);
 async function api(u,o={}){let r=await fetch(u,o),d=await r.json();if(!r.ok)throw Error(d.error||"خطا");return d}
 async function access(){try{await api("/api/access",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:$("code").value})});$("gate").classList.add("hide");$("auth").classList.remove("hide")}catch(e){$("err").textContent=e.message}}
 async function auth(){try{let d=await api(mode==="reg"?"/api/register":"/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:$("user").value,password:$("pass").value})});enter(d.user)}catch(e){$("aerr").textContent=e.message}}
-function enter(u){user=u;$("auth").classList.add("hide");$("chat").classList.remove("hide");$("me").textContent="@"+u.username;users();load()}
+function enter(u){
+user=u;
+$("auth").classList.add("hide");
+$("chat").classList.remove("hide");
+$("me").textContent="@"+u.username;
+users();
+$("messages").innerHTML="";
+$("title").textContent="گفتگوها";
+}
 async function users(){
 let us=await api("/api/users");
 let list=us.filter(x=>x.id!==user.id);
