@@ -1,28 +1,79 @@
-*{box-sizing:border-box;font-family:Tahoma,Arial,sans-serif}
+*{
+box-sizing:border-box;
+font-family:Tahoma,Arial,sans-serif;
+}
 
 body{
 margin:0;
-height:100vh;
 background:#0b141a;
-color:white;
+color:#fff;
 direction:rtl;
-overflow:hidden;
+height:100vh;
+}
+
+.hide{
+display:none!important;
+}
+
+.box{
+width:90%;
+max-width:380px;
+margin:70px auto;
+background:#202c33;
+padding:25px;
+border-radius:20px;
+text-align:center;
+}
+
+.box h1{
+font-size:28px;
+}
+
+.box input{
+width:100%;
+height:45px;
+margin:8px 0;
+padding:10px 15px;
+border:0;
+outline:0;
+border-radius:25px;
+background:#2a3942;
+color:white;
+}
+
+button{
+background:#00a884;
+color:white;
+border:0;
+padding:10px 18px;
+border-radius:20px;
+font-size:15px;
+margin:5px;
+}
+
+
+/* app */
+
+.app{
+height:100vh;
+display:flex;
+flex-direction:column;
 }
 
 header{
 height:60px;
 background:#202c33;
 display:flex;
-align-items:center;
 justify-content:space-between;
+align-items:center;
 padding:0 15px;
-font-size:18px;
-font-weight:bold;
+font-size:20px;
 }
 
 .content{
-height:calc(100vh - 120px);
+flex:1;
 display:flex;
+overflow:hidden;
 }
 
 aside{
@@ -31,83 +82,67 @@ background:#111b21;
 padding:10px;
 }
 
+aside button{
+width:100%;
+}
+
 main{
 flex:1;
 display:flex;
 flex-direction:column;
 }
 
+#title{
+background:#202c33;
+padding:12px;
+font-weight:bold;
+}
+
 #messages{
 flex:1;
-overflow:auto;
-padding:12px;
-display:flex;
-flex-direction:column;
-gap:6px;
+overflow-y:auto;
+padding:10px;
 }
 
 .bubble{
 max-width:75%;
 background:#202c33;
 padding:8px 12px;
+margin:6px;
 border-radius:12px;
-font-size:14px;
-line-height:1.5;
-align-self:flex-start;
 }
 
 .mine{
 background:#005c4b;
-align-self:flex-end;
-}
-
-.time{
-font-size:10px;
-color:#aaa;
-display:block;
-text-align:left;
+margin-right:auto;
 }
 
 .send{
 height:60px;
 background:#202c33;
 display:flex;
-gap:6px;
+align-items:center;
 padding:8px;
+gap:5px;
 }
 
-.send input{
+.send input[type=text],
+#text{
 flex:1;
-border:0;
-outline:0;
-border-radius:25px;
-padding:10px 15px;
+height:42px;
 background:#2a3942;
 color:white;
-}
-
-button{
 border:0;
-border-radius:50%;
-width:42px;
-height:42px;
-background:#00a884;
-color:white;
-font-size:17px;
+border-radius:25px;
+padding:10px;
 }
 
 footer{
-height:30px;
-text-align:center;
 background:#111b21;
+text-align:center;
+padding:6px;
 color:#aaa;
 font-size:12px;
-padding:6px;
-}
-
-audio{
-width:180px;
-height:35px;
 }
 
 @media(max-width:600px){
@@ -115,151 +150,11 @@ aside{
 display:none;
 }
 
-.bubble{
-max-width:85%;
-font-size:13px;
-}
-}
-
-/* final compact chat */
-#messages{
-padding:8px!important;
-gap:4px!important;
-}
-
-.bubble{
-max-width:70%!important;
-padding:6px 10px!important;
-font-size:13px!important;
-border-radius:14px!important;
-}
-
-.send{
-height:52px!important;
-padding:6px!important;
-}
-
-.send input{
-font-size:13px!important;
-padding:8px!important;
-}
-
-.send button{
-width:38px!important;
-height:38px!important;
-font-size:14px!important;
-}
-
-header{
-height:52px!important;
-font-size:16px!important;
-}
-
-footer{
-height:25px!important;
-font-size:10px!important;
-}
-TEST123
-
-/* FORCE NEW DESIGN */
-body{
-background:#111b21 !important;
-}
-
-header{
-background:#202c33 !important;
-height:55px !important;
-font-size:17px !important;
-}
-
-#messages{
-padding:6px !important;
-}
-
-.bubble{
-max-width:65% !important;
-font-size:13px !important;
-padding:6px 10px !important;
-border-radius:15px !important;
-margin:3px !important;
-}
-
-.mine{
-background:#005c4b !important;
-}
-
-.send{
-height:55px !important;
-padding:6px !important;
-}
-
-.send input{
-height:40px !important;
-border-radius:22px !important;
-}
-
-.send button{
-width:38px !important;
-height:38px !important;
-}
-
-footer{
-font-size:10px !important;
-padding:4px !important;
-}
-
-
-body::before{
-content:"نسخه جدید ChatRoom فعال شد";
-position:fixed;
-top:0;
-left:0;
-right:0;
-background:red;
-color:white;
-text-align:center;
-z-index:99999;
-font-size:20px;
-padding:10px;
-}
-
-
 .box{
-width:90%;
-max-width:400px;
-margin:40px auto;
-background:#202c33;
-padding:25px;
-border-radius:20px;
-text-align:center;
+margin-top:40px;
 }
 
-.box h2{
-font-size:28px;
-margin-bottom:25px;
+header{
+font-size:17px;
 }
-
-.box input{
-width:100%;
-height:45px;
-margin:8px 0;
-padding:10px;
-border-radius:20px;
-border:0;
-background:#2a3942;
-color:white;
-text-align:right;
 }
-
-.box button{
-margin:8px;
-border-radius:20px;
-padding:10px 25px;
-width:auto;
-height:auto;
-}
-
-.hide{
-display:none!important;
-}
-
