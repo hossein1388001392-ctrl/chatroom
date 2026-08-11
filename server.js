@@ -148,7 +148,6 @@ io.on("connection",socket=>{
 socket.on("join",data=>{
 socket.join(data.room);
 socket.data.user=String(data.username);
-socket.data.user=data.username;
 });
 
 
