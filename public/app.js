@@ -17,21 +17,17 @@ async function users(){
 let us=await api("/api/users");
 let list=us.filter(x=>x.id!==user.id);
 
-let box=$("messages");
-
-if(box){
-box.innerHTML=list.map(x=>`
+if($("contacts")){
+$("contacts").innerHTML=list.map(x=>`
 <div class="chatitem" onclick="room='dm:${x.id}';load()">
 <div class="avatar">👤</div>
-<div>
+<div class="chatinfo">
 <div class="chatname">${x.username}</div>
 <div class="lastmsg">شروع گفتگو</div>
 </div>
 </div>
 `).join("");
 }
-
-$("users").innerHTML="";
 }
 
 async function load(){socket.emit("join",{room,username:user.username});$("title").textContent=room==="general"?"عمومی":"گفتگوی خصوصی";$("messages").innerHTML="";(await api("/api/messages/"+encodeURIComponent(room))).forEach(show)}
