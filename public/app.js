@@ -111,10 +111,16 @@ users();
 
 
 
+
+
 function openChat(id,name){
  room="dm:"+id;
+
+ $("chatlist").style.display="none";
  $("contacts").style.display="none";
  $("messages").style.display="block";
+
  $("title").textContent=name;
+
  load();
 }
