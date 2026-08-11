@@ -17,6 +17,14 @@ async function users(){
 let us=await api("/api/users");
 let list=us.filter(x=>x.id!==user.id);
 
+if(list.length===0){
+list=[
+{id:"test1",username:"علی"},
+{id:"test2",username:"محمد"},
+{id:"test3",username:"دوست من"}
+];
+}
+
 if($("contacts")){
 $("contacts").innerHTML=list.map(x=>`
 <div class="chatitem" onclick="room='dm:${x.id}';load()">
