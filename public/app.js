@@ -12,7 +12,7 @@ $("me").textContent="@"+u.username;
 users();
 $("messages").innerHTML="";
 $("messages").style.display="none";
-$("contacts").style.display="block";
+$("chatlist").style.display="block";
 $("title").textContent="گفتگوها";
 }
 async function users(){
@@ -27,10 +27,10 @@ list=[
 ];
 }
 
-if($("contacts")){
-$("contacts").style.display="block";
+if($("chatlist")){
+$("chatlist").style.display="block";
 $("messages").style.display="none";
-$("contacts").innerHTML=list.map(x=>`
+$("chatlist").innerHTML=list.map(x=>`
 <div class="chatitem" onclick="room='dm:${x.id}';load()">
 <div class="avatar">👤</div>
 <div class="chatinfo">
@@ -104,7 +104,7 @@ if(m)m.style.display=m.style.display==="block"?"none":"block";
 
 function home(){
 $("messages").style.display="none";
-$("contacts").style.display="block";
+$("chatlist").style.display="block";
 $("title").textContent="گفتگوها";
 users();
 }
