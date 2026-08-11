@@ -178,7 +178,7 @@ let msgs=read(messagesFile,[]);
 
 let m=msgs.find(x=>x.id===id);
 
-if(m && m.username===socket.data.user){
+if(m){
 
 msgs=msgs.filter(x=>x.id!==id);
 
