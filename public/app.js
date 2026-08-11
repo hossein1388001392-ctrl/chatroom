@@ -31,7 +31,7 @@ if($("chatlist")){
 $("chatlist").style.display="block";
 $("messages").style.display="none";
 $("chatlist").innerHTML=list.map(x=>`
-<div class="chatitem" onclick="room='dm:${x.id}';load()">
+<div class="chatitem" onclick="openChat('${x.id}','${x.username}')">
 <div class="avatar">👤</div>
 <div class="chatinfo">
 <div class="chatname">${x.username}</div>
@@ -109,3 +109,12 @@ $("title").textContent="گفتگوها";
 users();
 }
 
+
+
+function openChat(id,name){
+ room="dm:"+id;
+ $("contacts").style.display="none";
+ $("messages").style.display="block";
+ $("title").textContent=name;
+ load();
+}
