@@ -1,7 +1,7 @@
 const express=require("express"),http=require("http"),path=require("path"),fs=require("fs"),crypto=require("crypto"),bcrypt=require("bcryptjs"),session=require("express-session"),multer=require("multer");
 const {Server}=require("socket.io");
 const app=express(),server=http.createServer(app),io=new Server(server);
-const PORT=3000,ACCESS_CODE="123456",SECRET="change-this-secret";
+const PORT=process.env.PORT||3000,ACCESS_CODE="123456",SECRET="change-this-secret";
 const data=path.join(__dirname,"data"),uploads=path.join(__dirname,"public/uploads");
 fs.mkdirSync(data,{recursive:true});fs.mkdirSync(uploads,{recursive:true});
 const uf=path.join(data,"users.json"),mf=path.join(data,"messages.json");
