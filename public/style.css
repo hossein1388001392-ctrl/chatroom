@@ -82,3 +82,15 @@ button {
     opacity: .5;
   }
 }
+.footer{
+  text-align:center;
+  padding:10px;
+  background:#020617;
+  color:#94a3b8;
+}
+
+.footer button{
+  width:auto;
+  border-radius:20px;
+  padding:8px 20px;
+}

@@ -1,3 +1,4 @@
+
 const socket=io();let mode="reg",user=null,room="general",rec=null,chunks=[];
 const $=x=>document.getElementById(x);
 async function api(u,o={}){let r=await fetch(u,o),d=await r.json();if(!r.ok)throw Error(d.error||"خطا");return d}
@@ -14,3 +15,13 @@ async function sendFile(){let f=$("file").files[0];if(!f)return;let fd=new FormD
 async function voice(){if(rec?.state==="recording"){rec.stop();return}let s=await navigator.mediaDevices.getUserMedia({audio:true});chunks=[];rec=new MediaRecorder(s);rec.ondataavailable=e=>chunks.push(e.data);rec.onstop=async()=>{s.getTracks().forEach(t=>t.stop());let fd=new FormData();fd.append("file",new Blob(chunks,{type:"audio/webm"}),"voice.webm");let d=await api("/api/upload",{method:"POST",body:fd});socket.emit("message",{room,file:d})};rec.start()}
 async function logout(){await api("/api/logout",{method:"POST"});location.reload()}
 (async()=>{let m=await api("/api/me");if(m.access){$("gate").classList.add("hide");if(m.user)enter(m.user);else $("auth").classList.remove("hide")}})()
+function support(){
+  let msg = prompt("پیام خود را برای پشتیبانی بنویسید:");
+  if(msg){
+    socket.emit("message",{
+      room:"support",
+      text:"🛠️ پیام پشتیبانی: "+msg
+    });
+    alert("پیام شما ارسال شد");
+  }
+}
