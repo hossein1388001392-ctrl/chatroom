@@ -1,0 +1,16 @@
+const socket=io();let mode="reg",user=null,room="general",rec=null,chunks=[];
+const $=x=>document.getElementById(x);
+async function api(u,o={}){let r=await fetch(u,o),d=await r.json();if(!r.ok)throw Error(d.error||"خطا");return d}
+async function access(){try{await api("/api/access",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:$("code").value})});$("gate").classList.add("hide");$("auth").classList.remove("hide")}catch(e){$("err").textContent=e.message}}
+async function auth(){try{let d=await api(mode==="reg"?"/api/register":"/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:$("user").value,password:$("pass").value})});enter(d.user)}catch(e){$("aerr").textContent=e.message}}
+function enter(u){user=u;$("auth").classList.add("hide");$("chat").classList.remove("hide");$("me").textContent="@"+u.username;users();load()}
+async function users(){let us=await api("/api/users");$("users").innerHTML=us.filter(x=>x.id!==user.id).map(x=>`<button onclick="room='dm:${x.id}';load()">👤 ${x.username}</button>`).join("")}
+async function load(){socket.emit("join",{room,username:user.username});$("title").textContent=room==="general"?"عمومی":"گفتگوی خصوصی";$("messages").innerHTML="";(await api("/api/messages/"+encodeURIComponent(room))).forEach(show)}
+function show(m){let d=document.createElement("div");d.className="bubble "+(m.username===user.username?"mine":"");let x=`<small>${m.username}</small><br>${esc(m.text)}`;if(m.file?.type?.startsWith("image/"))x+=`<br><img src="${m.file.url}">`;else if(m.file?.type?.startsWith("video/"))x+=`<br><video src="${m.file.url}" controls></video>`;else if(m.file)x+=`<br><audio src="${m.file.url}" controls></audio>`;d.innerHTML=x;$("messages").appendChild(d);$("messages").scrollTop=$("messages").scrollHeight}
+function esc(x){return String(x||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+socket.on("message",m=>{if(m.room===room)show(m)})
+function send(){let t=$("text").value.trim();if(t){socket.emit("message",{room,text:t});$("text").value=""}}
+async function sendFile(){let f=$("file").files[0];if(!f)return;let fd=new FormData();fd.append("file",f);try{let d=await api("/api/upload",{method:"POST",body:fd});socket.emit("message",{room,file:d});$("file").value=""}catch(e){alert(e.message)}}
+async function voice(){if(rec?.state==="recording"){rec.stop();return}let s=await navigator.mediaDevices.getUserMedia({audio:true});chunks=[];rec=new MediaRecorder(s);rec.ondataavailable=e=>chunks.push(e.data);rec.onstop=async()=>{s.getTracks().forEach(t=>t.stop());let fd=new FormData();fd.append("file",new Blob(chunks,{type:"audio/webm"}),"voice.webm");let d=await api("/api/upload",{method:"POST",body:fd});socket.emit("message",{room,file:d})};rec.start()}
+async function logout(){await api("/api/logout",{method:"POST"});location.reload()}
+(async()=>{let m=await api("/api/me");if(m.access){$("gate").classList.add("hide");if(m.user)enter(m.user);else $("auth").classList.remove("hide")}})()
