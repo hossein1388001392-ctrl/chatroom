@@ -285,3 +285,21 @@ font-size:9px!important;
 padding:3px!important;
 }
 
+audio{
+    width:220px!important;
+    height:38px!important;
+    margin:3px 0;
+}
+
+.bubble audio{
+    border-radius:20px;
+}
+
+#messages{
+    gap:2px;
+}
+
+.bubble{
+    margin:4px!important;
+    min-height:35px;
+}
