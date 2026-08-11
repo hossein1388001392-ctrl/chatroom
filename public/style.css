@@ -160,3 +160,51 @@ height:25px!important;
 font-size:10px!important;
 }
 TEST123
+
+/* FORCE NEW DESIGN */
+body{
+background:#111b21 !important;
+}
+
+header{
+background:#202c33 !important;
+height:55px !important;
+font-size:17px !important;
+}
+
+#messages{
+padding:6px !important;
+}
+
+.bubble{
+max-width:65% !important;
+font-size:13px !important;
+padding:6px 10px !important;
+border-radius:15px !important;
+margin:3px !important;
+}
+
+.mine{
+background:#005c4b !important;
+}
+
+.send{
+height:55px !important;
+padding:6px !important;
+}
+
+.send input{
+height:40px !important;
+border-radius:22px !important;
+}
+
+.send button{
+width:38px !important;
+height:38px !important;
+}
+
+footer{
+font-size:10px !important;
+padding:4px !important;
+}
+
