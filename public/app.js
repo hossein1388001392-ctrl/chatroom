@@ -28,6 +28,8 @@ list=[
 }
 
 if($("contacts")){
+$("contacts").style.display="block";
+$("messages").style.display="none";
 $("contacts").innerHTML=list.map(x=>`
 <div class="chatitem" onclick="room='dm:${x.id}';load()">
 <div class="avatar">👤</div>
