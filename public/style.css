@@ -120,3 +120,42 @@ max-width:85%;
 font-size:13px;
 }
 }
+
+/* final compact chat */
+#messages{
+padding:8px!important;
+gap:4px!important;
+}
+
+.bubble{
+max-width:70%!important;
+padding:6px 10px!important;
+font-size:13px!important;
+border-radius:14px!important;
+}
+
+.send{
+height:52px!important;
+padding:6px!important;
+}
+
+.send input{
+font-size:13px!important;
+padding:8px!important;
+}
+
+.send button{
+width:38px!important;
+height:38px!important;
+font-size:14px!important;
+}
+
+header{
+height:52px!important;
+font-size:16px!important;
+}
+
+footer{
+height:25px!important;
+font-size:10px!important;
+}
