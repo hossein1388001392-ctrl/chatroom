@@ -329,3 +329,35 @@ font-size:12px!important;
 padding:2px!important;
 }
 
+
+.bubble{
+position:relative;
+}
+
+.more{
+position:absolute;
+left:5px;
+top:3px;
+background:none!important;
+color:#aaa!important;
+font-size:18px!important;
+padding:0!important;
+}
+
+.menu{
+display:none;
+position:absolute;
+left:5px;
+top:25px;
+background:#202c33;
+border-radius:8px;
+padding:5px;
+z-index:5;
+}
+
+.menu button{
+background:none!important;
+font-size:13px!important;
+padding:5px 12px!important;
+}
+
