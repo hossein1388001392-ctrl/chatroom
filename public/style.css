@@ -303,3 +303,21 @@ audio{
     margin:4px!important;
     min-height:35px;
 }
+
+.time{
+font-size:10px;
+opacity:.7;
+text-align:left;
+margin-top:3px;
+}
+
+.bubble{
+max-width:75%!important;
+border-radius:12px 12px 12px 3px!important;
+}
+
+.bubble.mine{
+margin-left:auto!important;
+border-radius:12px 12px 3px 12px!important;
+}
+
