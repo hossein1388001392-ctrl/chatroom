@@ -333,7 +333,18 @@ function show(m) {
 
     ${body}
 
-    <div class="time">
+    <div class="reactions" id="react-${m.id}">
+${m.reactions ? Object.entries(m.reactions).map(([r,a])=>r+" "+a.length).join(" ") : ""}
+</div>
+
+<div class="reactBtns">
+<button onclick="react('${m.id}','❤️')">❤️</button>
+<button onclick="react('${m.id}','😂')">😂</button>
+<button onclick="react('${m.id}','👍')">👍</button>
+<button onclick="react('${m.id}','😮')">😮</button>
+</div>
+
+<div class="time">
 ${time}
 ${m.username===user?.username ? (m.status==="read" ? " ✓✓" : " ✓") : ""}
 </div>
@@ -341,6 +352,33 @@ ${m.username===user?.username ? (m.status==="read" ? " ✓✓" : " ✓") : ""}
 
   box.appendChild(d);
 }
+
+
+
+function react(id,react){
+
+ socket.emit("reactMessage",{
+   id,
+   react
+ });
+
+}
+
+
+socket.on("messageReact",data=>{
+
+ const box=document.getElementById("react-"+data.id);
+
+ if(box){
+
+   box.innerHTML=Object.entries(data.reactions)
+   .map(([r,a])=>r+" "+a.length)
+   .join(" ");
+
+ }
+
+});
+
 
 function scrollMessages() {
   const box = $("messages");

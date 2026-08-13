@@ -224,6 +224,40 @@ socket.on("readMessage",id=>{
 
 });
 
+
+
+socket.on("reactMessage",data=>{
+
+ let msgs=read(messagesFile,[]);
+
+ let m=msgs.find(x=>x.id===data.id);
+
+ if(m){
+
+   if(!m.reactions){
+     m.reactions={};
+   }
+
+   if(!m.reactions[data.react]){
+     m.reactions[data.react]=[];
+   }
+
+   if(!m.reactions[data.react].includes(socket.data.user)){
+     m.reactions[data.react].push(socket.data.user);
+   }
+
+   write(messagesFile,msgs);
+
+   io.emit("messageReact",{
+     id:data.id,
+     reactions:m.reactions
+   });
+
+ }
+
+});
+
+
 socket.on("deleteMessage",id=>{
 
 let msgs=read(messagesFile,[]);
