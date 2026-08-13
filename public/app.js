@@ -287,7 +287,7 @@ function show(m) {
     <div class="bubbleTop">
       <small>${escapeHtml(m.username || "")}</small>
       <button class="moreBtn"
-              onclick="messageMenu('${escapeHtml(m.id || "")}')">⋮</button>
+              onclick="messageMenu(this.closest('.bubble').dataset.id)">⋮</button>
     </div>
 
     ${body}
