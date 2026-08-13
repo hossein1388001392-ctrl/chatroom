@@ -7,6 +7,7 @@ let rec = null;
 let chunks = [];
 let onlineUsers = [];
 let lastSeen = {};
+let unread = {};
 
 const $ = id => document.getElementById(id);
 
@@ -216,6 +217,7 @@ function openGeneral() {
 
 function openPrivate(id, username) {
   room = privateRoom(user.id, id);
+  unread[room]=0;
 
   if ($("contacts")) $("contacts").style.display = "none";
   if ($("messages")) $("messages").style.display = "block";
@@ -512,6 +514,11 @@ socket.on("message", msg => {
   if (msg.room === room) {
     show(msg);
     scrollMessages();
+  } else {
+
+    unread[msg.room] = (unread[msg.room] || 0) + 1;
+
+    users();
   }
 });
 

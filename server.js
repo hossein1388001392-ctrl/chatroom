@@ -157,12 +157,31 @@ type:req.file.mimetype
 app.use(express.static(path.join(__dirname,"public")));
 
 
+let onlineUsers = {};
+let lastSeen = {};
+
 io.on("connection",socket=>{
 
 
 socket.on("join",data=>{
 socket.join(data.room);
 socket.data.user=String(data.username);
+
+onlineUsers[socket.data.user]=true;
+
+io.emit("onlineUsers",Object.keys(onlineUsers));
+io.emit("lastSeen",lastSeen);
+});
+
+socket.on("disconnect",()=>{
+ if(socket.data.user){
+   delete onlineUsers[socket.data.user];
+
+   lastSeen[socket.data.user]=Date.now();
+
+   io.emit("onlineUsers",Object.keys(onlineUsers));
+   io.emit("lastSeen",lastSeen);
+ }
 });
 
 
@@ -174,7 +193,8 @@ room:data.room,
 username:socket.data.user,
 text:data.text||"",
 file:data.file||null,
-time:Date.now()
+time:Date.now(),
+status:"sent"
 };
 
 let msgs=read(messagesFile,[]);
