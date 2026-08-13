@@ -259,6 +259,33 @@ socket.on("reactMessage",data=>{
 });
 
 
+
+
+socket.on("editMessage",data=>{
+
+ let msgs=read(messagesFile,[]);
+
+ let m=msgs.find(x=>x.id===data.id);
+
+ if(m){
+
+   m.text=data.text;
+
+   m.edited=true;
+
+   write(messagesFile,msgs);
+
+   io.to(m.room).emit("messageEdited",{
+     id:m.id,
+     text:m.text,
+     edited:true
+   });
+
+ }
+
+});
+
+
 socket.on("deleteMessage",id=>{
 
 let msgs=read(messagesFile,[]);

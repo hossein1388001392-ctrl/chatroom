@@ -388,6 +388,43 @@ socket.on("messageReact",data=>{
 });
 
 
+
+
+function editMessage(id,text){
+
+ let n=prompt("ویرایش پیام:",text);
+
+ if(n!==null && n.trim()){
+
+   socket.emit("editMessage",{
+     id,
+     text:n.trim()
+   });
+
+ }
+
+}
+
+
+socket.on("messageEdited",data=>{
+
+ const el=document.querySelector(
+ `.bubble[data-id="${CSS.escape(String(data.id))}"]`
+ );
+
+ if(el){
+
+   const txt=el.querySelector(".messageText");
+
+   if(txt){
+     txt.textContent=data.text+" ✏️";
+   }
+
+ }
+
+});
+
+
 function scrollMessages() {
   const box = $("messages");
   if (box) {
