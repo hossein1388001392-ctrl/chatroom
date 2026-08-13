@@ -15,7 +15,6 @@ const io=new Server(server);
 const PORT=process.env.PORT||3000;
 const ACCESS_CODE="123456";
 const ADMIN_CODE="987654";
-const ADMIN_CODE="987654";
 
 const data=path.join(__dirname,"data");
 const uploads=path.join(__dirname,"public/uploads");
@@ -126,6 +125,40 @@ app.post("/api/admin/approve/:id",(req,res)=>{
  return res.status(404).json({error:"کاربر پیدا نشد"});
 
  u.approved=true;
+
+ write(usersFile,users);
+
+ res.json({ok:true});
+
+});
+
+
+
+
+app.post("/api/admin/users",(req,res)=>{
+
+ if(req.body.adminCode!==ADMIN_CODE)
+ return res.status(403).json({error:"دسترسی مدیر رد شد"});
+
+ let users=read(usersFile,[]);
+
+ res.json(users.map(u=>({
+   id:u.id,
+   username:u.username,
+   approved:!!u.approved
+ })));
+
+});
+
+
+app.post("/api/admin/delete/:id",(req,res)=>{
+
+ if(req.body.adminCode!==ADMIN_CODE)
+ return res.status(403).json({error:"دسترسی مدیر رد شد"});
+
+ let users=read(usersFile,[]);
+
+ users=users.filter(x=>x.id!==req.params.id);
 
  write(usersFile,users);
 

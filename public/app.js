@@ -651,3 +651,98 @@ socket.on("deleted", id => {
     }
   } catch {}
 })();
+
+
+function openAdmin(){
+
+ if($("admin")){
+   $("chat").classList.add("hide");
+   $("admin").classList.remove("hide");
+ }
+
+}
+
+
+async function loadAdmin(){
+
+ let code=$("adminCode").value.trim();
+
+ if(!code) return alert("رمز مدیر را وارد کن");
+
+
+ try{
+
+ let users=await api("/api/admin/users",{
+   method:"POST",
+   headers:{
+    "Content-Type":"application/json"
+   },
+   body:JSON.stringify({
+    adminCode:code
+   })
+ });
+
+
+ $("adminUsers").innerHTML=users.map(u=>`
+
+ <div class="chatitem">
+
+ <b>${escapeHtml(u.username)}</b>
+
+ ${u.approved ? "✅ تایید شده" : "⏳ در انتظار"}
+
+ <button onclick="approveUser('${u.id}','${code}')">
+ تایید
+ </button>
+
+ <button onclick="deleteUser('${u.id}','${code}')">
+ حذف
+ </button>
+
+ </div>
+
+ `).join("");
+
+
+ }catch(e){
+  alert(e.message);
+ }
+
+}
+
+
+async function approveUser(id,code){
+
+ await api("/api/admin/approve/"+id,{
+ method:"POST",
+ headers:{
+ "Content-Type":"application/json"
+ },
+ body:JSON.stringify({
+ adminCode:code
+ })
+ });
+
+ loadAdmin();
+
+}
+
+
+async function deleteUser(id,code){
+
+ if(!confirm("حذف شود؟")) return;
+
+ await api("/api/admin/delete/"+id,{
+ method:"POST",
+ headers:{
+ "Content-Type":"application/json"
+ },
+ body:JSON.stringify({
+ adminCode:code
+ })
+ });
+
+ loadAdmin();
+
+}
+
