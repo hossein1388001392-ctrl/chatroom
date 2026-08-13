@@ -5,6 +5,7 @@ let user = null;
 let room = "general";
 let rec = null;
 let chunks = [];
+let onlineUsers = [];
 
 const $ = id => document.getElementById(id);
 
@@ -32,6 +33,11 @@ function escapeHtml(s) {
 function privateRoom(a, b) {
   return "dm:" + [String(a), String(b)].sort().join(":");
 }
+
+socket.on("onlineUsers", list => {
+  onlineUsers = Array.isArray(list) ? list : [];
+  users();
+});
 
 async function access() {
   try {
@@ -149,7 +155,10 @@ async function users() {
       onclick='openPrivate(${JSON.stringify(String(x.id))},${JSON.stringify(String(x.username))})'>
         <div class="avatar">👤</div>
         <div class="chatinfo">
-          <div class="chatname">${escapeHtml(x.username)}</div>
+          <div class="chatname">
+${onlineUsers.includes(String(x.username)) ? "🟢 " : "⚪ "}
+${escapeHtml(x.username)}
+</div>
           <div class="lastmsg">${escapeHtml(preview(x.id))}</div>
         </div>
       </div>
@@ -163,7 +172,10 @@ async function users() {
       onclick='openPrivate(${JSON.stringify(String(x.id))},${JSON.stringify(String(x.username))})'>
         <div class="avatar">👤</div>
         <div class="chatinfo">
-          <div class="chatname">${escapeHtml(x.username)}</div>
+          <div class="chatname">
+${onlineUsers.includes(String(x.username)) ? "🟢 " : "⚪ "}
+${escapeHtml(x.username)}
+</div>
         </div>
       </div>
     `).join("");
