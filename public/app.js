@@ -8,6 +8,7 @@ let chunks = [];
 let onlineUsers = [];
 let lastSeen = {};
 let unread = {};
+let replyTo = null;
 
 const $ = id => document.getElementById(id);
 
@@ -281,6 +282,13 @@ function show(m) {
 
   let body = "";
 
+if(m.reply){
+ body += `
+ <div class="replyBox">
+ ↩️ پاسخ به: ${escapeHtml(m.reply.text || "")}
+ </div>`;
+}
+
   if (m.file) {
     const f = m.file;
     const url =
@@ -401,8 +409,11 @@ function send() {
 
   socket.emit("message", {
     room,
-    text
+    text,
+    reply: replyTo
   });
+
+  replyTo=null;
 
   input.value = "";
   input.focus();

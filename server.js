@@ -193,6 +193,7 @@ room:data.room,
 username:socket.data.user,
 text:data.text||"",
 file:data.file||null,
+reply:data.reply||null,
 time:Date.now(),
 status:"sent"
 };
