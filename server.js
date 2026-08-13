@@ -110,6 +110,21 @@ res.json(read(usersFile,[]).map(userSafe));
 });
 
 
+
+
+app.get("/api/last-messages",auth,(req,res)=>{
+ let msgs=read(messagesFile,[]);
+ let result={};
+
+ msgs.forEach(m=>{
+   if(!result[m.room] || result[m.room].time < m.time){
+     result[m.room]=m;
+   }
+ });
+
+ res.json(result);
+});
+
 app.get("/api/messages/:room",auth,(req,res)=>{
 
 let msgs=read(messagesFile,[]);

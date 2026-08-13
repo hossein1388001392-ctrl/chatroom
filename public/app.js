@@ -103,19 +103,19 @@ async function users() {
   if (!user) return;
 
   let list = [];
+  let last = {};
 
   try {
     const us = await api("/api/users");
     list = Array.isArray(us)
       ? us.filter(x => String(x.id) !== String(user.id))
       : [];
+
+    last = await api("/api/last-messages");
   } catch {}
 
   const contacts = $("contacts");
-
   if (!contacts) return;
-
-  contacts.style.display = "block";
 
   if (list.length === 0) {
     list = [
@@ -123,6 +123,14 @@ async function users() {
       {id:"test2", username:"محمد"},
       {id:"test3", username:"دوست من"}
     ];
+  }
+
+  function preview(id){
+    let r = privateRoom(user.id,id);
+    if(last[r]){
+      return last[r].text || "📎 فایل";
+    }
+    return "شروع گفتگو";
   }
 
   contacts.innerHTML = `
@@ -136,25 +144,23 @@ async function users() {
       </div>
     </div>
 
-    ${list.map(x => {
-      const rid = privateRoom(user.id, x.id);
-      return `
-        <div class="chatitem" onclick='openPrivate(${JSON.stringify(String(x.id))},${JSON.stringify(String(x.username))})'>
-          <div class="avatar">👤</div>
-          <div class="chatinfo">
-            <div class="chatname">${escapeHtml(x.username)}</div>
-            <div class="lastmsg">شروع گفتگو</div>
-          </div>
+    ${list.map(x=>`
+      <div class="chatitem"
+      onclick='openPrivate(${JSON.stringify(String(x.id))},${JSON.stringify(String(x.username))})'>
+        <div class="avatar">👤</div>
+        <div class="chatinfo">
+          <div class="chatname">${escapeHtml(x.username)}</div>
+          <div class="lastmsg">${escapeHtml(preview(x.id))}</div>
         </div>
-      `;
-    }).join("")}
+      </div>
+    `).join("")}
   `;
 
-  const side = $("chatlist");
-  if (side) {
-    side.innerHTML = list.map(x => `
+  const side=$("chatlist");
+  if(side){
+    side.innerHTML=list.map(x=>`
       <div class="chatitem smallItem"
-           onclick='openPrivate(${JSON.stringify(String(x.id))},${JSON.stringify(String(x.username))})'>
+      onclick='openPrivate(${JSON.stringify(String(x.id))},${JSON.stringify(String(x.username))})'>
         <div class="avatar">👤</div>
         <div class="chatinfo">
           <div class="chatname">${escapeHtml(x.username)}</div>
@@ -163,7 +169,6 @@ async function users() {
     `).join("");
   }
 }
-
 function openGeneral() {
   room = "general";
 
