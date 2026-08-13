@@ -333,7 +333,10 @@ function show(m) {
 
     ${body}
 
-    <div class="time">${time}</div>
+    <div class="time">
+${time}
+${m.username===user?.username ? (m.status==="read" ? " ✓✓" : " ✓") : ""}
+</div>
   `;
 
   box.appendChild(d);
@@ -513,12 +516,30 @@ socket.on("message", msg => {
 
   if (msg.room === room) {
     show(msg);
+
+    if(msg.id && msg.username !== user.username){
+      socket.emit("readMessage",msg.id);
+    }
+
     scrollMessages();
   } else {
 
     unread[msg.room] = (unread[msg.room] || 0) + 1;
 
     users();
+  }
+});
+
+
+
+socket.on("messageRead",id=>{
+  const el=document.querySelector(`.bubble[data-id="${CSS.escape(String(id))}"]`);
+
+  if(el){
+    const t=el.querySelector(".time");
+    if(t && !t.textContent.includes("✓✓")){
+      t.textContent += " ✓✓";
+    }
   }
 });
 

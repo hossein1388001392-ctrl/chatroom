@@ -207,6 +207,23 @@ io.to(data.room).emit("message",msg);
 });
 
 
+
+
+socket.on("readMessage",id=>{
+
+ let msgs=read(messagesFile,[]);
+
+ let m=msgs.find(x=>x.id===id);
+
+ if(m){
+   m.status="read";
+   write(messagesFile,msgs);
+
+   io.emit("messageRead",id);
+ }
+
+});
+
 socket.on("deleteMessage",id=>{
 
 let msgs=read(messagesFile,[]);
