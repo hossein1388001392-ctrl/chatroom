@@ -15,6 +15,7 @@ const io=new Server(server);
 const PORT=process.env.PORT||3000;
 const ACCESS_CODE="123456";
 const ADMIN_CODE="987654";
+const ADMIN_CODE="987654";
 
 const data=path.join(__dirname,"data");
 const uploads=path.join(__dirname,"public/uploads");
