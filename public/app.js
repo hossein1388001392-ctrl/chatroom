@@ -477,11 +477,11 @@ socket.on("message", msg => {
 });
 
 socket.on("deleted", id => {
-  const el = document.querySelector(
-    `.bubble[data-id="${CSS.escape(String(id))}"]`
-  );
-
-  if (el) el.remove();
+  document.querySelectorAll(".bubble").forEach(el=>{
+    if(String(el.dataset.id)===String(id)){
+      el.remove();
+    }
+  });
 });
 
 (async function boot() {
