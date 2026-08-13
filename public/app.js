@@ -1,127 +1,500 @@
+const socket = io();
 
-const socket=io();let mode="reg",user=null,room="general",rec=null,chunks=[];
-const $=x=>document.getElementById(x);
-async function api(u,o={}){let r=await fetch(u,o),d=await r.json();if(!r.ok)throw Error(d.error||"خطا");return d}
-async function access(){try{await api("/api/access",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:$("code").value})});$("gate").classList.add("hide");$("auth").classList.remove("hide")}catch(e){$("err").textContent=e.message}}
-async function auth(){try{let d=await api(mode==="reg"?"/api/register":"/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username:$("user").value,password:$("pass").value})});enter(d.user)}catch(e){$("aerr").textContent=e.message}}
-function enter(u){
-user=u;
-$("auth").classList.add("hide");
-$("chat").classList.remove("hide");
-$("me").textContent="@"+u.username;
-users();
-$("messages").innerHTML="";
-$("messages").style.display="none";
-$("chatlist").style.display="block";
-$("title").textContent="گفتگوها";
-}
-async function users(){
-let us=await api("/api/users");
-let list=us.filter(x=>x.id!==user.id);
+let mode = "reg";
+let user = null;
+let room = "general";
+let rec = null;
+let chunks = [];
 
-if(list.length===0){
-list=[
-{id:"test1",username:"علی"},
-{id:"test2",username:"محمد"},
-{id:"test3",username:"دوست من"}
-];
+const $ = id => document.getElementById(id);
+
+async function api(url, options = {}) {
+  const r = await fetch(url, options);
+  let d = {};
+  try { d = await r.json(); } catch {}
+  if (!r.ok) throw Error(d.error || "خطا");
+  return d;
 }
 
-if($("chatlist")){
-$("chatlist").style.display="block";
-$("messages").style.display="none";
-$("chatlist").innerHTML=list.map(x=>`
-<div class="chatitem" onclick="openChat('${x.id}','${x.username}')">
-<div class="avatar">👤</div>
-<div class="chatinfo">
-<div class="chatname">${x.username}</div>
-<div class="lastmsg">شروع گفتگو</div>
-</div>
-</div>
-`).join("");
-}
+function setText(id, text) {
+  if ($(id)) $(id).textContent = text;
 }
 
-async function load(){socket.emit("join",{room,username:user.username});$("title").textContent=room==="general"?"عمومی":"گفتگوی خصوصی";$("messages").innerHTML="";(await api("/api/messages/"+encodeURIComponent(room))).forEach(show)}
-function show(m){
-let d=document.createElement("div");
-d.className="bubble "+(m.username===user.username?"mine":"");
-d.dataset.id=m.id;
-
-let time=new Date(m.time||Date.now()).toLocaleTimeString("fa-IR",{hour:"2-digit",minute:"2-digit"});
-
-let x=`<small>${m.username}</small><br>${esc(m.text)}<div class="time">${time}</div>`;
-
-if(m.file?.type?.startsWith("image/")) x+=`<br><img src="${m.file.url}">`;
-else if(m.file?.type?.startsWith("video/")) x+=`<br><video src="${m.file.url}" controls></video>`;
-else if(m.file) x+=`<br><audio src="${m.file.url}" controls></audio>`;
-
-x+=`<button class="more" onclick="menuMsg('${m.id}')">⋮</button>
-<div id="menu-${m.id}" class="menu">
-<button onclick="delMsg('${m.id}')">حذف</button>
-</div>`;
-
-d.innerHTML=x;
-
-$("messages").appendChild(d);
-$("messages").scrollTop=$("messages").scrollHeight;
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
-function esc(x){return String(x||"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
-socket.on("message",m=>{if(m.room===room)show(m)})
-function send(){let t=$("text").value.trim();if(t){socket.emit("message",{room,text:t});$("text").value=""}}
-async function sendFile(){let f=$("file").files[0];if(!f)return;let fd=new FormData();fd.append("file",f);try{let d=await api("/api/upload",{method:"POST",body:fd});socket.emit("message",{room,file:d});$("file").value=""}catch(e){alert(e.message)}}
-async function voice(){if(rec?.state==="recording"){rec.stop();return}let s=await navigator.mediaDevices.getUserMedia({audio:true});chunks=[];rec=new MediaRecorder(s);rec.ondataavailable=e=>chunks.push(e.data);rec.onstop=async()=>{s.getTracks().forEach(t=>t.stop());let fd=new FormData();fd.append("file",new Blob(chunks,{type:"audio/webm"}),"voice.webm");let d=await api("/api/upload",{method:"POST",body:fd});socket.emit("message",{room,file:d})};rec.start()}
-async function logout(){await api("/api/logout",{method:"POST"});location.reload()}
-(async()=>{let m=await api("/api/me");if(m.access){$("gate").classList.add("hide");if(m.user){enter(m.user);users();}else $("auth").classList.remove("hide")}})()
-function support(){
-  let msg = prompt("پیام خود را برای پشتیبانی بنویسید:");
-  if(msg){
-    socket.emit("message",{
-      room:"support",
-      text:"🛠️ پیام پشتیبانی: "+msg
+function privateRoom(a, b) {
+  return "dm:" + [String(a), String(b)].sort().join(":");
+}
+
+async function access() {
+  try {
+    await api("/api/access", {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        code: $("code") ? $("code").value : ""
+      })
     });
-    alert("پیام شما ارسال شد");
+
+    if ($("gate")) $("gate").classList.add("hide");
+    if ($("auth")) $("auth").classList.remove("hide");
+  } catch (e) {
+    setText("err", e.message);
   }
 }
 
+function switchMode() {
+  mode = mode === "reg" ? "login" : "reg";
 
-function delMsg(id){
- if(confirm("حذف پیام؟")){
-  socket.emit("deleteMessage",id);
- }
+  if ($("authTitle"))
+    $("authTitle").textContent = mode === "reg" ? "ساخت حساب" : "ورود";
+
+  if ($("authButton"))
+    $("authButton").textContent = mode === "reg" ? "ثبت نام" : "ورود";
+
+  if ($("modeButton"))
+    $("modeButton").textContent =
+      mode === "reg" ? "حساب دارم" : "ساخت حساب جدید";
 }
 
-socket.on("deleted",id=>{
- let e=document.querySelector(`[data-id="${id}"]`);
- if(e) e.remove();
+async function auth() {
+  try {
+    const d = await api(
+      mode === "reg" ? "/api/register" : "/api/login",
+      {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          username: $("user") ? $("user").value.trim() : "",
+          password: $("pass") ? $("pass").value : ""
+        })
+      }
+    );
+
+    enter(d.user);
+  } catch (e) {
+    setText("aerr", e.message);
+  }
+}
+
+function enter(u) {
+  user = u;
+
+  if ($("gate")) $("gate").classList.add("hide");
+  if ($("auth")) $("auth").classList.add("hide");
+  if ($("chat")) $("chat").classList.remove("hide");
+
+  setText("me", "@" + u.username);
+
+  room = "general";
+
+  showHome();
+  users();
+}
+
+async function users() {
+  if (!user) return;
+
+  let list = [];
+
+  try {
+    const us = await api("/api/users");
+    list = Array.isArray(us)
+      ? us.filter(x => String(x.id) !== String(user.id))
+      : [];
+  } catch {}
+
+  const contacts = $("contacts");
+
+  if (!contacts) return;
+
+  contacts.style.display = "block";
+
+  if (list.length === 0) {
+    list = [
+      {id:"test1", username:"علی"},
+      {id:"test2", username:"محمد"},
+      {id:"test3", username:"دوست من"}
+    ];
+  }
+
+  contacts.innerHTML = `
+    <div class="sectionTitle">گفتگوها</div>
+
+    <div class="chatitem generalItem" onclick="openGeneral()">
+      <div class="avatar">🌐</div>
+      <div class="chatinfo">
+        <div class="chatname">عمومی</div>
+        <div class="lastmsg">گفتگوی عمومی</div>
+      </div>
+    </div>
+
+    ${list.map(x => {
+      const rid = privateRoom(user.id, x.id);
+      return `
+        <div class="chatitem" onclick='openPrivate(${JSON.stringify(String(x.id))},${JSON.stringify(String(x.username))})'>
+          <div class="avatar">👤</div>
+          <div class="chatinfo">
+            <div class="chatname">${escapeHtml(x.username)}</div>
+            <div class="lastmsg">شروع گفتگو</div>
+          </div>
+        </div>
+      `;
+    }).join("")}
+  `;
+
+  const side = $("chatlist");
+  if (side) {
+    side.innerHTML = list.map(x => `
+      <div class="chatitem smallItem"
+           onclick='openPrivate(${JSON.stringify(String(x.id))},${JSON.stringify(String(x.username))})'>
+        <div class="avatar">👤</div>
+        <div class="chatinfo">
+          <div class="chatname">${escapeHtml(x.username)}</div>
+        </div>
+      </div>
+    `).join("");
+  }
+}
+
+function openGeneral() {
+  room = "general";
+
+  if ($("contacts")) $("contacts").style.display = "none";
+  if ($("messages")) $("messages").style.display = "block";
+
+  setText("title", "عمومی");
+
+  load();
+}
+
+function openPrivate(id, username) {
+  room = privateRoom(user.id, id);
+
+  if ($("contacts")) $("contacts").style.display = "none";
+  if ($("messages")) $("messages").style.display = "block";
+
+  setText("title", "گفتگو با " + username);
+
+  load();
+}
+
+async function load() {
+  if (!user) return;
+
+  socket.emit("join", {
+    room,
+    username: user.username
+  });
+
+  if ($("messages")) {
+    $("messages").innerHTML =
+      '<div class="loading">در حال بارگذاری...</div>';
+    $("messages").style.display = "block";
+  }
+
+  try {
+    const data = await api(
+      "/api/messages/" + encodeURIComponent(room)
+    );
+
+    if ($("messages")) {
+      $("messages").innerHTML = "";
+      (Array.isArray(data) ? data : []).forEach(show);
+      scrollMessages();
+    }
+  } catch (e) {
+    if ($("messages"))
+      $("messages").innerHTML =
+        '<div class="loading">خطا در بارگذاری پیام‌ها</div>';
+  }
+}
+
+function show(m) {
+  if (!m) return;
+
+  const box = $("messages");
+  if (!box) return;
+
+  const d = document.createElement("div");
+
+  d.className =
+    "bubble " +
+    (m.username === user?.username ? "mine" : "theirs");
+
+  d.dataset.id = m.id || "";
+
+  const time = new Date(
+    m.time || Date.now()
+  ).toLocaleTimeString("fa-IR", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+
+  let body = "";
+
+  if (m.file) {
+    const f = m.file;
+    const url =
+      typeof f === "string"
+        ? f
+        : f.url || f.path || f.location || "";
+
+    if (url) {
+      const lower = url.toLowerCase();
+
+      if (
+        lower.includes(".webm") ||
+        lower.includes(".mp3") ||
+        lower.includes(".wav") ||
+        lower.includes(".ogg") ||
+        lower.includes("audio")
+      ) {
+        body += `<audio controls src="${escapeHtml(url)}"></audio>`;
+      } else if (
+        lower.includes(".jpg") ||
+        lower.includes(".jpeg") ||
+        lower.includes(".png") ||
+        lower.includes(".gif") ||
+        lower.includes(".webp") ||
+        lower.includes("image")
+      ) {
+        body += `<img class="messageImage" src="${escapeHtml(url)}">`;
+      } else {
+        body += `
+          <a class="fileLink"
+             href="${escapeHtml(url)}"
+             target="_blank">
+             📎 فایل
+          </a>
+        `;
+      }
+    }
+  }
+
+  if (m.text) {
+    body += `<div class="messageText">${escapeHtml(m.text)}</div>`;
+  }
+
+  d.innerHTML = `
+    <div class="bubbleTop">
+      <small>${escapeHtml(m.username || "")}</small>
+      <button class="moreBtn"
+              onclick="messageMenu('${escapeHtml(m.id || "")}')">⋮</button>
+    </div>
+
+    ${body}
+
+    <div class="time">${time}</div>
+  `;
+
+  box.appendChild(d);
+}
+
+function scrollMessages() {
+  const box = $("messages");
+  if (box) {
+    setTimeout(() => {
+      box.scrollTop = box.scrollHeight;
+    }, 30);
+  }
+}
+
+function send() {
+  if (!user) return;
+
+  const input = $("text");
+  if (!input) return;
+
+  const text = input.value.trim();
+
+  if (!text) return;
+
+  socket.emit("message", {
+    room,
+    text
+  });
+
+  input.value = "";
+  input.focus();
+}
+
+async function sendFile() {
+  if (!user) return;
+
+  const input = $("file");
+  const f = input?.files?.[0];
+
+  if (!f) return;
+
+  try {
+    const fd = new FormData();
+    fd.append("file", f);
+
+    const d = await api("/api/upload", {
+      method: "POST",
+      body: fd
+    });
+
+    socket.emit("message", {
+      room,
+      file: d
+    });
+
+    input.value = "";
+  } catch (e) {
+    alert(e.message);
+  }
+}
+
+async function voice() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    alert("ضبط صدا در این مرورگر در دسترس نیست");
+    return;
+  }
+
+  if (rec && rec.state === "recording") {
+    rec.stop();
+    return;
+  }
+
+  try {
+    const stream =
+      await navigator.mediaDevices.getUserMedia({audio:true});
+
+    chunks = [];
+
+    rec = new MediaRecorder(stream);
+
+    rec.ondataavailable = e => {
+      if (e.data.size) chunks.push(e.data);
+    };
+
+    rec.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+
+      try {
+        const blob = new Blob(chunks, {
+          type: "audio/webm"
+        });
+
+        const fd = new FormData();
+
+        fd.append(
+          "file",
+          blob,
+          "voice.webm"
+        );
+
+        const d = await api("/api/upload", {
+          method: "POST",
+          body: fd
+        });
+
+        socket.emit("message", {
+          room,
+          file: d
+        });
+      } catch (e) {
+        alert(e.message);
+      }
+
+      chunks = [];
+    };
+
+    rec.start();
+  } catch (e) {
+    alert("اجازه دسترسی به میکروفون داده نشد");
+  }
+}
+
+function messageMenu(id) {
+  if (!id) return;
+
+  if (confirm("این پیام حذف شود؟")) {
+    socket.emit("deleteMessage", id);
+  }
+}
+
+function home() {
+  showHome();
+}
+
+function showHome() {
+  room = "general";
+
+  if ($("messages")) {
+    $("messages").innerHTML = "";
+    $("messages").style.display = "none";
+  }
+
+  if ($("contacts")) {
+    $("contacts").style.display = "block";
+  }
+
+  setText("title", "گفتگوها");
+
+  users();
+}
+
+function support() {
+  const msg = prompt("پیام خود را برای پشتیبانی بنویسید:");
+
+  if (!msg || !msg.trim()) return;
+
+  socket.emit("message", {
+    room: "support",
+    text: msg.trim()
+  });
+
+  alert("پیام شما برای پشتیبانی ارسال شد.");
+}
+
+async function logout() {
+  try {
+    await api("/api/logout", {
+      method: "POST"
+    });
+  } catch {}
+
+  location.reload();
+}
+
+socket.on("message", msg => {
+  if (!msg) return;
+
+  if (msg.room === room) {
+    show(msg);
+    scrollMessages();
+  }
 });
 
-function menuMsg(id){
-let m=document.getElementById("menu-"+id);
-if(m)m.style.display=m.style.display==="block"?"none":"block";
-}
+socket.on("deleteMessage", id => {
+  const el = document.querySelector(
+    `.bubble[data-id="${CSS.escape(String(id))}"]`
+  );
 
-function home(){
-$("messages").style.display="none";
-$("chatlist").style.display="block";
-$("title").textContent="گفتگوها";
-users();
-}
+  if (el) el.remove();
+});
 
+(async function boot() {
+  try {
+    const m = await api("/api/me");
 
-
-
-
-function openChat(id,name){
- let ids=[user.id,String(id)].sort();
-room="dm:"+ids.join(":");
-
- $("chatlist").style.display="none";
- $("contacts").style.display="none";
- $("messages").style.display="block";
-
- $("title").textContent=name;
-
- load();
-}
+    if (m.access) {
+      if (m.user) {
+        enter(m.user);
+      } else {
+        if ($("gate")) $("gate").classList.add("hide");
+        if ($("auth")) $("auth").classList.remove("hide");
+      }
+    }
+  } catch {}
+})();
