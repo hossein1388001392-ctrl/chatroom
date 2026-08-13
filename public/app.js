@@ -6,6 +6,7 @@ let room = "general";
 let rec = null;
 let chunks = [];
 let onlineUsers = [];
+let lastSeen = {};
 
 const $ = id => document.getElementById(id);
 
@@ -38,6 +39,27 @@ socket.on("onlineUsers", list => {
   onlineUsers = Array.isArray(list) ? list : [];
   users();
 });
+
+socket.on("lastSeen", data => {
+  lastSeen = data || {};
+  users();
+});
+
+function statusText(id){
+  if(onlineUsers.includes(String(id))){
+    return "🟢 آنلاین";
+  }
+
+  if(lastSeen[id]){
+    let t=Math.floor((Date.now()-lastSeen[id])/60000);
+
+    if(t<1) return "⚪ همین الان";
+
+    return "⚪ "+t+" دقیقه پیش";
+  }
+
+  return "⚪ آفلاین";
+}
 
 async function access() {
   try {
@@ -159,7 +181,7 @@ async function users() {
 ${onlineUsers.includes(String(x.username)) ? "🟢 " : "⚪ "}
 ${escapeHtml(x.username)}
 </div>
-          <div class="lastmsg">${escapeHtml(preview(x.id))}</div>
+          <div class="lastmsg">${statusText(x.id)}<br>${escapeHtml(preview(x.id))}</div>
         </div>
       </div>
     `).join("")}
