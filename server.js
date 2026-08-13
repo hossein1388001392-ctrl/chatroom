@@ -14,6 +14,7 @@ const io=new Server(server);
 
 const PORT=process.env.PORT||3000;
 const ACCESS_CODE="123456";
+const ADMIN_CODE="987654";
 
 const data=path.join(__dirname,"data");
 const uploads=path.join(__dirname,"public/uploads");
@@ -74,7 +75,8 @@ return res.status(400).json({error:"کاربر وجود دارد"});
 let u={
 id:crypto.randomUUID(),
 username,
-passwordHash:await bcrypt.hash(password,10)
+passwordHash:await bcrypt.hash(password,10),
+approved:false
 };
 
 users.push(u);
@@ -98,9 +100,35 @@ x=>x.username.toLowerCase()==String(req.body.username).toLowerCase()
 if(!u || !(await bcrypt.compare(req.body.password,u.passwordHash)))
 return res.status(401).json({error:"اطلاعات اشتباه"});
 
+if(!u.approved)
+return res.status(403).json({error:"حساب شما هنوز تایید نشده است"});
+
 req.session.userId=u.id;
 
 res.json({user:userSafe(u)});
+
+});
+
+
+
+
+app.post("/api/admin/approve/:id",(req,res)=>{
+
+ if(req.body.adminCode!==ADMIN_CODE)
+ return res.status(403).json({error:"دسترسی مدیر رد شد"});
+
+ let users=read(usersFile,[]);
+
+ let u=users.find(x=>x.id===req.params.id);
+
+ if(!u)
+ return res.status(404).json({error:"کاربر پیدا نشد"});
+
+ u.approved=true;
+
+ write(usersFile,users);
+
+ res.json({ok:true});
 
 });
 
