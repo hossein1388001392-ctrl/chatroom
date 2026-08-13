@@ -476,7 +476,7 @@ socket.on("message", msg => {
   }
 });
 
-socket.on("deleteMessage", id => {
+socket.on("deleted", id => {
   const el = document.querySelector(
     `.bubble[data-id="${CSS.escape(String(id))}"]`
   );
