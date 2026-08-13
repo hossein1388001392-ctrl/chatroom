@@ -176,11 +176,14 @@ socket.on("deleteMessage",id=>{
 
 let msgs=read(messagesFile,[]);
 
-let m=msgs.find(x=>x.id===id);
+let index=msgs.findIndex(x=>
+x.id===id &&
+x.username===socket.data.user
+);
 
-if(m){
+if(index!==-1){
 
-msgs=msgs.filter(x=>x.id!==id);
+msgs.splice(index,1);
 
 write(messagesFile,msgs);
 
