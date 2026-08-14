@@ -752,3 +752,89 @@ async function deleteUser(id,code){
 
 }
 
+
+async function openAdmin(){
+
+  if($("chat")) $("chat").classList.add("hide");
+  if($("admin")) $("admin").classList.remove("hide");
+
+  let box=$("adminUsers");
+
+  if(!box) return;
+
+  box.innerHTML="در حال دریافت کاربران...";
+
+  try{
+
+    let users=await api("/api/admin/list");
+
+    box.innerHTML=users.map(u=>`
+
+      <div class="chatitem">
+
+        <div>
+          👤 ${escapeHtml(u.username)}
+          <br>
+          وضعیت:
+          ${u.approved ? "✅ تایید شده" : "⏳ منتظر تایید"}
+
+          <br>
+          نقش:
+          ${u.role}
+
+        </div>
+
+        ${
+          !u.approved
+          ?
+          `<button onclick="approveUser('${u.id}')">
+          تایید
+          </button>`
+          :
+          ""
+        }
+
+      </div>
+
+    `).join("");
+
+  }catch(e){
+
+    box.innerHTML="خطا: "+e.message;
+
+  }
+
+}
+
+
+function closeAdmin(){
+
+ if($("admin")) $("admin").classList.add("hide");
+
+ if($("chat")) $("chat").classList.remove("hide");
+
+}
+
+
+async function approveUser(id){
+
+ try{
+
+ await api("/api/admin/approve/"+id,{
+   method:"POST",
+   headers:{
+    "Content-Type":"application/json"
+   },
+   body:JSON.stringify({})
+ });
+
+ openAdmin();
+
+ }catch(e){
+
+ alert(e.message);
+
+ }
+
+}
+

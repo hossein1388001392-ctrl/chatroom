@@ -209,6 +209,29 @@ app.post("/api/admin/delete/:id",(req,res)=>{
 });
 
 
+
+
+app.get("/api/me",auth,(req,res)=>{
+
+ let users=read(usersFile,[]);
+
+ let u=users.find(x=>x.id===req.session.userId);
+
+ if(!u){
+   return res.json({
+    access:true,
+    user:null
+   });
+ }
+
+ res.json({
+   access:true,
+   user:userSafe(u)
+ });
+
+});
+
+
 app.get("/api/users",auth,(req,res)=>{
 res.json(read(usersFile,[]).map(userSafe));
 });
