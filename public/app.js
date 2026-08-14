@@ -123,7 +123,11 @@ function enter(u) {
 
   setText("me", "@" + u.username);
 
-if(u.role==="owner"){
+if(
+  u.role==="owner" ||
+  u.admin===true ||
+  u.username==="Hossein113"
+){
   if($("adminBtn")){
     $("adminBtn").classList.remove("hide");
   }
