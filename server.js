@@ -193,12 +193,15 @@ app.post("/api/admin/users",(req,res)=>{
 });
 
 
-app.post("/api/admin/delete/:id",(req,res)=>{
-
- if(req.body.adminCode!==ADMIN_CODE)
- return res.status(403).json({error:"دسترسی مدیر رد شد"});
+app.delete("/api/admin/user/:id",auth,(req,res)=>{
 
  let users=read(usersFile,[]);
+
+ let me=users.find(x=>x.id===req.session.userId);
+
+ if(!me || me.role!=="owner")
+ return res.status(403).json({error:"دسترسی مدیر رد شد"});
+
 
  users=users.filter(x=>x.id!==req.params.id);
 
