@@ -698,6 +698,16 @@ async function openAdmin(){
           نقش:
           ${u.role}
 
+          <br><br>
+
+          <button onclick="makeSupport('${u.id}')">
+          🛠 پشتیبان
+          </button>
+
+          <button onclick="deleteUser('${u.id}')">
+          ❌ حذف
+          </button>
+
         </div>
 
         ${
@@ -750,6 +760,51 @@ async function approveUser(id){
 
  alert(e.message);
 
+ }
+
+}
+
+
+
+async function makeSupport(id){
+
+ try{
+
+ await api("/api/admin/role/"+id,{
+  method:"POST",
+  headers:{
+   "Content-Type":"application/json"
+  },
+  body:JSON.stringify({
+   role:"support"
+  })
+ });
+
+ openAdmin();
+
+ }catch(e){
+  alert(e.message);
+ }
+
+}
+
+
+
+async function deleteUser(id){
+
+ if(!confirm("این کاربر حذف شود؟"))
+ return;
+
+ try{
+
+ await api("/api/admin/user/"+id,{
+  method:"DELETE"
+ });
+
+ openAdmin();
+
+ }catch(e){
+  alert(e.message);
  }
 
 }
