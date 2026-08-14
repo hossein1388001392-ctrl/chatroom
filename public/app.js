@@ -123,6 +123,12 @@ function enter(u) {
 
   setText("me", "@" + u.username);
 
+if(u.role==="owner"){
+  if($("adminBtn")){
+    $("adminBtn").classList.remove("hide");
+  }
+}
+
   room = "general";
 
   showHome();

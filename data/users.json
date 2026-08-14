@@ -4,6 +4,7 @@
     "username": "Hossein113",
     "passwordHash": "$2a$10$1hGhm2ffr1J7ZhZZminvHu7czJqqeUBFa5z/ZAZCUGgu74wd6K.86",
     "approved": true,
-    "admin": true
+    "admin": true,
+    "role": "owner"
   }
 ]

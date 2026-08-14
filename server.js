@@ -35,7 +35,7 @@ function write(file,data){
 }
 
 function userSafe(u){
- return {id:u.id,username:u.username}
+ return {id:u.id,username:u.username,role:u.role||"user"}
 }
 
 app.use(express.json());
@@ -46,6 +46,42 @@ app.use(session({
  saveUninitialized:false,
  cookie:{maxAge:86400000}
 }));
+
+
+
+function getCurrentUser(req){
+ let users=read(usersFile,[]);
+ return users.find(x=>x.id===req.session.userId);
+}
+
+function adminOnly(req,res,next){
+
+ let u=getCurrentUser(req);
+
+ if(!u || (u.role!=="owner" && u.role!=="support")){
+   return res.status(403).json({
+    error:"دسترسی ندارید"
+   });
+ }
+
+ next();
+
+}
+
+function ownerOnly(req,res,next){
+
+ let u=getCurrentUser(req);
+
+ if(!u || u.role!=="owner"){
+   return res.status(403).json({
+    error:"فقط مدیر اصلی"
+   });
+ }
+
+ next();
+
+}
+
 
 function auth(req,res,next){
  if(!req.session.userId)
@@ -219,6 +255,77 @@ res.json({
 url:"/uploads/"+req.file.filename,
 type:req.file.mimetype
 });
+});
+
+
+
+
+app.get("/api/admin/list",auth,adminOnly,(req,res)=>{
+
+ let users=read(usersFile,[]);
+
+ res.json(users.map(u=>({
+   id:u.id,
+   username:u.username,
+   approved:!!u.approved,
+   role:u.role||"user"
+ })));
+
+});
+
+
+app.post("/api/admin/approve/:id",auth,ownerOnly,(req,res)=>{
+
+ let users=read(usersFile,[]);
+
+ let u=users.find(x=>x.id===req.params.id);
+
+ if(!u)
+ return res.status(404).json({
+  error:"کاربر پیدا نشد"
+ });
+
+ u.approved=true;
+
+ write(usersFile,users);
+
+ res.json({ok:true});
+
+});
+
+
+app.post("/api/admin/role/:id",auth,ownerOnly,(req,res)=>{
+
+ let users=read(usersFile,[]);
+
+ let u=users.find(x=>x.id===req.params.id);
+
+ if(!u)
+ return res.status(404).json({
+  error:"کاربر پیدا نشد"
+ });
+
+ if(["user","support"].includes(req.body.role)){
+   u.role=req.body.role;
+ }
+
+ write(usersFile,users);
+
+ res.json({ok:true});
+
+});
+
+
+app.delete("/api/admin/user/:id",auth,ownerOnly,(req,res)=>{
+
+ let users=read(usersFile,[]);
+
+ users=users.filter(x=>x.id!==req.params.id);
+
+ write(usersFile,users);
+
+ res.json({ok:true});
+
 });
 
 
