@@ -123,6 +123,9 @@ function enter(u) {
 
   setText("me", "@" + u.username);
 
+console.log("LOGIN USER:", u);
+alert("USER DATA:\n" + JSON.stringify(u,null,2));
+
 if(
   u.role==="owner" ||
   u.admin===true ||
